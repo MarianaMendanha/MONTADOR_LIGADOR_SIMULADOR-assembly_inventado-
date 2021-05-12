@@ -31,18 +31,18 @@ e em seguida para compilar o montador:
 e então utilizando de 1 a 3 arquivos .asm já existentes (código com a linguagem hipotética) com o arquivo de entrada na linha de comando no formato: 
 ```".\montador.exe myprogram1.asm myprogram2.asm"``` 
 para a execução do programa. Caso o código .asm esteja escrito de acordo com as especificações, que são: section data antes de text, não ter BEGIN e END no caso de recebimento de apenas 1 arquivo, ter BEGIN e END no caso de 2 ou 3 arquivos e as variáveis do tipo PUBLIC e EXTERN estarem dentro da SECTION DATA como o exemplo:
-```
+``` asm
 MOD_A: BEGIN
 SECTION DATA
     MOD_B: EXTERN
-	  PUBLIC FAT
+	  PUBLIC FT
 	  PUBLIC N
 	  N: SPACE
 	  ONE: CONST 1
 SECTION TEXT
     INPUT N
     LOAD N
-    FAT: SUB ONE
+    FT: SUB ONE
     JMPZ FIM
     JMP MOD_B
     FIM: OUTPUT N
