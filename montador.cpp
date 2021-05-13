@@ -328,7 +328,7 @@ bool exe(string arq, vector<string> linhas, int module){
                 else{semantica_operandos.push_back(operandos);operandos_linha.push_back(make_pair(operandos,addr+1));}
             }  
         }
-
+         
       //TIRA DUPLICATOS DE VETOR DE USO
         sort(semantica_operandos.begin(), semantica_operandos.end());
 
@@ -471,7 +471,7 @@ bool exe(string arq, vector<string> linhas, int module){
             if(!achoudefinicao){error_program=true;cout<<"linha "<<operandos_linha.at(contador_linhas).second<<":: erro semantico: rotulo ["<<uti<<"] utilizado e nao definido"<<endl;}
             contador_linhas++;
         }
-
+        
       //ERRO DE REDEFINICAO
         vector<string> redefinido;
         for(auto p : semantica_labels){
@@ -544,6 +544,7 @@ bool exe(string arq, vector<string> linhas, int module){
         }
         
         /*//IMPRESSÃO DO TEXT
+        int lna=0;
         for(auto linha : TEXT){
             if(linha.instruction=="\0"){cout<<lna<<" | _______________(SECTION)_______________"<<endl;}else{
             cout<<lna<<" | "<<linha.label<<" "<<linha.instruction<<" "<<linha.op1<<" "<<linha.op2<<endl;}
@@ -561,7 +562,7 @@ bool exe(string arq, vector<string> linhas, int module){
         vector<OBJ> OBJETO;
         OBJETO.push_back(OBJ());
         OBJETO.at(0).endereco=1;
-
+        
         //PREENCHENDO ENDERECOS EM OBJ
         int edr=1,edraux;
         counter=1;
@@ -618,15 +619,19 @@ bool exe(string arq, vector<string> linhas, int module){
         for(auto linha : TEXT){
             counter=0;
             if(linha.instruction!="\0"){
+                //cout<<"-->"<<linha.instruction<<endl;
                 for(auto data : DATA){
                     if(linha.op1==data.label){
+                        //cout<<counter<<"-"<<linha.instruction<<"-"<<data.label<<endl;
                         var=OBJETO.at(counter).endereco;
+                        //cout<<var<<endl;
                         declar_data=true;
                         break;      
                     }else{declar_data=false;}
                     counter++;   
                 } 
                 if(declar_data){
+                    //cout<<counter<<"-"<<linha.instruction<<"-"<<linha.op1<<endl;
                     OBJETO.at(counter2).var=var;
                     counter2++;
                 }else{
@@ -661,8 +666,11 @@ bool exe(string arq, vector<string> linhas, int module){
         for(auto txt : TEXT){
             ln=0;
             if(txt.instruction=="COPY"){
+                //cout<<"entrei"<<endl;
                 for(auto data : DATA){
+                    //cout<<txt.op2<<" "<<data.label<<endl;
                     if(txt.op2==data.label){
+                        //cout<<"------>"<<txt.op2<<endl;
                         OBJETO.at(counter).var2=ln;
                     }
                     ln++;
@@ -714,31 +722,31 @@ bool exe(string arq, vector<string> linhas, int module){
             }else{break;}
             counter++;
         }
-
+        
         //ARRUMANDO OS ENDERECOS
         ln=0;
+        int endoftxt=0;
         for(auto obj : OBJINV){
             if(ln<txtsize){
                 OBJINV.at(ln).endereco-=datasize;
+                endoftxt=OBJINV.at(ln).endereco;
                 ln++;
             }else{
                 OBJINV.at(ln).endereco+=(txtsize)*2;
                 ln++;
             }
         }
-
+        //cout<<"aqui"<<datasize<<endl;
+    
         //TRATAMENTO DE CASO PARA ENDERECOS DE SECTION DATA
         int dtsz = datasize,txtsz=txtsize;
         ln=0;
         counter=0;
         for(auto obj : OBJINV){
-            if(obj.opcode==14){
+            if(obj.opcode==14  && txtsize>1){
+                //cout<<OBJINV.at(ln+1).endereco<<"----------"<<obj.endereco<<endl;
                 if(OBJINV.at(ln+1).endereco==obj.endereco+2){
                     ln++;
-                    while(txtsz--){
-                        OBJINV.at(counter).var-=1;
-                        counter++;
-                    }
                     while(dtsz--){
                         OBJINV.at(ln).endereco-=1;
                         ln++;
@@ -748,30 +756,65 @@ bool exe(string arq, vector<string> linhas, int module){
             }
             ln++;        
         }
+        /*cout<<endl<<"***************CODIGO OBJETO INVERTIDO***************"<<endl;
+        ln=0;
+        for(auto linha:OBJINV){cout<<ln<<" | "<<linha.endereco<<" _ "<<linha.opcode<<" _ "<<linha.var<<" _ "<<linha.var2<<endl;ln++;}*/ 
+
+        //ACHA O ENDEREÇO DE INICIO DE SECTION DATA 
+        int endofvar=0,begofdata=0,countdata=0;
+        for(auto aux : OBJINV){
+            //cout<<aux.endereco<<endl;
+            if(aux.endereco==endoftxt){
+                if(aux.endereco!=0){begofdata=OBJINV.at(countdata+1).endereco;}
+            }
+            countdata++;
+        }
+        //cout<<"beg->"<<begofdata<<endl;
+        
 
         //ARRUMANDO AS VAR
         ln=0;
+        int cntdt=0;
+        //cout<<datasize<<"dt txt"<<txtsize<<endl;
         for(auto obj : OBJINV){
+            //cout<<"obj "<<obj.var<<endl;
             if(ln<txtsize){
-                if(obj.var<datasize){
-                    OBJINV.at(ln).var+=(txtsize)*2;
+                if(obj.var<=datasize-1){
+                    //cout<<obj.var<<" ----- "<<ln<<" "<<OBJINV.at(3).var<<endl;
+                    OBJINV.at(ln).var+=begofdata;
+                    //OBJINV.at(ln).var+=(txtsize)*2;
                     ln++;
                 }else{
-                    OBJINV.at(ln).var-=datasize-1;
+                    for(auto dt : OBJETO){if(dt.endereco==obj.var){break;};cntdt++;}
+                    //cout<<obj.var<<"var cnt"<<cntdt<<endl;
+                    cntdt-=datasize;
+                    //cout<<obj.var<<"var cnt"<<cntdt<<" "<<OBJINV.at(ln).var<<" "<<OBJINV.at(cntdt).endereco<<endl;
+                    OBJINV.at(ln).var=OBJINV.at(cntdt).endereco;
+                    //cout<<OBJINV.at(ln).var<<endl;
+                    cntdt=0;
                     ln++;
                 }
             }
         }
-
+        
         //ARRUMANDO AS VAR 2
         ln=0;
+        cntdt=0;
         for(auto obj : OBJINV){
             if(ln<txtsize){
                 if(obj.var2<datasize){
-                    if(obj.var2!=0){OBJINV.at(ln).var2+=(txtsize)*2;}
+                    if(obj.var2!=0){OBJINV.at(ln).var2+=begofdata;}
                     ln++;
                 }else{
-                    if(obj.var2!=0){OBJINV.at(ln).var2-=datasize;}
+                    if(obj.var2!=0){
+                        for(auto dt : OBJETO){if(dt.endereco==obj.var2){break;};cntdt++;}
+                        //cout<<obj.var<<"var cnt"<<cntdt<<endl;
+                        cntdt-=datasize;
+                        //cout<<obj.var<<"var cnt"<<cntdt<<" "<<OBJINV.at(ln).var<<" "<<OBJINV.at(cntdt).endereco<<endl;
+                        OBJINV.at(ln).var2=OBJINV.at(cntdt).endereco;
+                        //cout<<OBJINV.at(ln).var<<endl;
+                        cntdt=0;
+                    }
                     ln++;
                 }
             }
@@ -780,7 +823,7 @@ bool exe(string arq, vector<string> linhas, int module){
         //ZERANDO VARIAVEL DE INSTRUCAO STOP
         ln=0;
         for(auto obj : OBJINV){
-            if(obj.opcode==14){OBJINV.at(ln).var=0;}
+            if(obj.opcode==14){OBJINV.at(ln).var=0;OBJINV.at(ln).var2=0;}
             ln++;
         }
 
@@ -790,49 +833,75 @@ bool exe(string arq, vector<string> linhas, int module){
             if(data.instruction=="CONST"){OBJINV.at(ln).opcode=stoi(data.op1);}
             ln++;
         } 
+
         
         //TABELA DE DEFINIÇÕES - PREENCHIMENTO DE VALORES 
         if(module != 1){
             counter2 = 0;
             for(auto tdef : tabDef){
-                bool defTxt = false;
+                bool defTxt = false, defDt = false;
                 counter = 0;
                 for(auto linha : TEXT){
                     if(tdef.first==linha.label){
+                        //cout<<"---"<<linha.label<<" "<<counter<<" "<<counter2<<endl;
                         tabDef.at(counter2).second = OBJINV.at(counter).endereco;
                         counter2++;
                         defTxt=true;
                     }
+                    //cout<<counter<<" -counter- "<<counter2<<endl;
                     counter++;
                 }  
                 if(!defTxt){
                     counter = TEXT.size();  
                     for(auto linha : DATA){
                         if(tdef.first==linha.label){
+                            //cout<<"---"<<linha.label<<" "<<counter<<" "<<counter2<<endl;
                             tabDef.at(counter2).second = OBJINV.at(counter).endereco;
                             counter2++;
+                            defDt=true;
                         }
+                        //cout<<counter<<" +counter+ "<<counter2<<endl;
                         counter++;
                     }
+                    if(!defTxt && !defDt){tabDef.at(counter2).second = 0; counter2++;}
                 }    
                 
             }
-        }    
+        } 
+
+
         //TABELA DE USO - PREENCHIMENTO DE ENDEREÇOS
         if(module != 1){
             counter2 = 0;
             for(auto tuso : tabUso_check){
                 counter = 0;
                 for(auto linha : TEXT){
+                    //cout<<counter<<" cntr "<<counter2<<endl;
                     if(tuso.first==linha.op1){
+                        //cout<<tuso.first<<endl;
                         tabUso.push_back(make_pair(tuso.first , OBJINV.at(counter).endereco+1));
                         OBJINV.at(counter).var = 0;
                         counter2++;
                     }
                     counter++;
-                }  
+                } 
+                counter=0; 
+                for(auto linha : TEXT){
+                    //cout<<counter<<" cntr+ "<<counter2<<endl;
+                    if(tuso.first==linha.op2){
+                        //cout<<tuso.first<<endl;
+                        tabUso.push_back(make_pair(tuso.first , OBJINV.at(counter).endereco+2));
+                        OBJINV.at(counter).var2 = 0;
+                        counter2++;
+                    }
+                    counter++;
+                }
             }
         }
+
+
+
+
         /*//IMPRESSÃO DO CÓDIGO OBJETO, TABELA DE DEFINIÇÕES E TABELA DE USO
         cout<<endl<<"***************CODIGO OBJETO INVERTIDO***************"<<endl;
         ln=0;
@@ -845,7 +914,7 @@ bool exe(string arq, vector<string> linhas, int module){
         for(auto a : tabUso){
             cout<<"["<<a.first<<"] ["<<a.second<<"]"<<endl;
         }
-         cout<<"+++++++++++++++++++++++++++++++++++++++++++"<<endl;*/
+        cout<<"+++++++++++++++++++++++++++++++++++++++++++"<<endl;*/
 
 
         //INSERINDO CODIGO OBJETO EM ARQUIVO .OBJ
@@ -860,7 +929,7 @@ bool exe(string arq, vector<string> linhas, int module){
         //Contagem do tamanho do programa
         int arqTam = (2*txtsize)+datasize;
         counter = 1;
-        for(auto linha:OBJINV){if(linha.opcode==14 && counter<=txtsize){arqTam-=1;}; counter++;}
+        for(auto linha:OBJINV){if(linha.opcode==14 && counter<=txtsize){arqTam-=1;}; if(linha.opcode==9 && counter<=txtsize){arqTam+=1;}; counter++;}
 
         //Mapa de bits
         string arqMapBit;

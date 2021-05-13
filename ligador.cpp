@@ -81,16 +81,21 @@ void exe(string arq, int module){
             
             int pos = Ters.find(" ");
             int posf = Ters.rfind(" ");
+            //cout<<Ters<<" +++ "<<stoi(Ters.substr(0,pos))<<endl;
             codLig.push_back(stoi(Ters.substr(0,pos)));
-            if(pos != -1 && pos == posf){codLig.push_back(stoi(Ters.substr(pos+1)));}
+            if(pos != -1 && pos == posf){codLig.push_back(stoi(Ters.substr(pos+1))); /*cout<<Ters<<" "<<stoi(Ters.substr(pos+1))<<endl;*/}
             if(pos != posf){
-                codLig.push_back(stoi(Ters.substr(pos+1,Ters.size()-posf-1)));
+                //cout<<Ters.at(posf)<<"|"<<stoi(Ters.substr(pos+1,Ters.size()-posf))<<"|"<<endl;
+                //cout<<"---"<<Ters<<endl;
+                codLig.push_back(stoi(Ters.substr(pos+1,Ters.size()-posf)));
                 codLig.push_back(stoi(Ters.substr(posf+1)));
             }
             counter++;    
             
         }
-    }   
+    } 
+   
+
     //MAPA DE BITS,TABELAS DE USO, TABELA DE DEFINIÇÃO E COÓDIGO OBJ ARQ2
     for(auto linha:linhas2){
         if(linha.at(0)=='R'){
@@ -120,11 +125,12 @@ void exe(string arq, int module){
             codLig.push_back(stoi(Ters.substr(0,pos)));
             if(pos != -1 && pos == posf){codLig.push_back(stoi(Ters.substr(pos+1)));}
             if(pos != posf){
-                codLig.push_back(stoi(Ters.substr(pos+1,Ters.size()-posf-1)));
+                codLig.push_back(stoi(Ters.substr(pos+1,Ters.size()-posf)));
                 codLig.push_back(stoi(Ters.substr(posf+1)));
             }
         }
     }
+   
     //MAPA DE BITS,TABELAS DE USO, TABELA DE DEFINIÇÃO E COÓDIGO OBJ ARQ3
     if(module==3){
         //TABELAS DE USO E TABELA DE DEFINIÇÃO ARQ3
@@ -156,12 +162,18 @@ void exe(string arq, int module){
                 codLig.push_back(stoi(Ters.substr(0,pos)));
                 if(pos != -1 && pos == posf){codLig.push_back(stoi(Ters.substr(pos+1)));}
                 if(pos != posf){
-                codLig.push_back(stoi(Ters.substr(pos+1,Ters.size()-posf-1)));
-                codLig.push_back(stoi(Ters.substr(posf+1)));
+                    codLig.push_back(stoi(Ters.substr(pos+1,Ters.size()-posf)));
+                    codLig.push_back(stoi(Ters.substr(posf+1)));
                 }
             }
         }
     }
+
+    /*cout<<"CLIG-0--------------------------------"<<endl; 
+    int counter1=1; 
+    for(auto a:codLig){cout<<"|"<<a<<"|"; if(counter1==4){cout<<endl;counter1=0;}; counter1++;}
+    cout<<endl<<"--------------------------------------"<<endl;*/
+
     
     /*//IMPRESSÃO DAS TABELAS
     cout<<"USO1----------------------------------"<<endl;  
@@ -196,6 +208,12 @@ void exe(string arq, int module){
             codLig.at(tu.second + fatCorr.at(0) + fatCorr.at(1)) = vlr;
         }
     }
+    /*cout<<"CLIG-0--------------------------------"<<endl; 
+    counter1=1; 
+    for(auto a:codLig){cout<<"|"<<a<<"|"; if(counter1==4){cout<<endl;counter1=0;}; counter1++;}
+    cout<<endl<<"--------------------------------------"<<endl;*/
+
+
     /*//CÓDIGO LIGADO ATUALIZADO
     cout<<"CLIG-2--------------------------------"<<endl; 
     counter=1; 
@@ -214,8 +232,8 @@ void exe(string arq, int module){
             counter++;
         }
     }
-    /*//CÓDIGO LIGADO ATUALIZADO
-    cout<<"CLIG-3--------------------------------"<<endl; 
+    //CÓDIGO LIGADO ATUALIZADO
+    /*cout<<"CLIG-3--------------------------------"<<endl; 
     counter=1; 
     for(auto a:codLig){cout<<"|"<<a<<"|"; if(counter==4){cout<<endl;counter=0;}; counter++;}
     cout<<endl<<"--------------------------------------"<<endl;*/
