@@ -1,0 +1,11 @@
+H mod_fat_1
+H 7
+R 0000000
+U MOD_FAT 5
+U N 1
+U N 3
+D AUX 6
+T 12 0
+T 10 0
+T 5 0
+T 0

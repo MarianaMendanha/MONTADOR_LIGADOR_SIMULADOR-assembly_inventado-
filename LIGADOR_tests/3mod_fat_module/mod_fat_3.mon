@@ -1,0 +1,9 @@
+H mod_fat_3
+H 4
+R 0100
+D N 3
+D FIM 0
+D MOD_FIM 0
+T 13 3
+T 14
+T 0

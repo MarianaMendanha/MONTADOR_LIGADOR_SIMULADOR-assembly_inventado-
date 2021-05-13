@@ -1,0 +1,13 @@
+H fat_mod_B
+H 11
+R 01000001000
+U FAT 9
+U N 3
+U N 5
+D MOD_B 0
+T 11 10
+T 3 0
+T 11 0
+T 10 10
+T 5 0
+T 0

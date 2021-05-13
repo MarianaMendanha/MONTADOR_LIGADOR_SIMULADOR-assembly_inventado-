@@ -1,0 +1,15 @@
+MOD_A: begin
+section data
+Y: EXTERN
+MOD_B: EXTERN
+PUBLIC VAL
+PUBLIC L1
+VAL: CONST 5
+section text
+INPUT Y
+LOAD VAL
+ADD Y
+STORE Y
+JMPP MOD_B
+L1: STOP
+END
