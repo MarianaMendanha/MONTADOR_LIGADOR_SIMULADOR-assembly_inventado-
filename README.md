@@ -8,10 +8,10 @@ Trabalho 2 do Curso de Software Básico com montador para módulos, ligador e si
 
 ## Primeiros Passos
 
-Para executar o projeto, será necessário instalar os seguintes programas:
+Para executar o projeto, é interessante instalar os seguintes programas:
 
-- [VSCode: Necessário para executar o projeto C++](https://code.visualstudio.com/download)
-- [Extensão C\C++: Necessário para realizar o build do projeto C++](https://code.visualstudio.com/download)
+- [VSCode: Recomendado para executar o projeto C++](https://code.visualstudio.com/download)
+- [Extensão C\C++: Recomendado para realizar o build do projeto C++](https://code.visualstudio.com/download)
 
 ## Sobre o Assembly inventado
 As instruções utilizadas no assembly inventado podem ser vistas a seguir:
